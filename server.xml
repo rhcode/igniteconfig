@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/util
+       http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!--
+        Initialize property configurer so we can reference environment variables.
+    -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_FALLBACK"/>
+        <property name="searchSystemEnvironment" value="true"/>
+    </bean>
+
+    <!--
+        Configuration of Ignite node.
+    -->
+    <bean id="grid.cfg" class="org.apache.ignite.configuration.IgniteConfiguration">
+
+        <!--
+            TCP discovery SPI can be configured with list of addresses if multicast is not available.
+        -->
+        <property name="discoverySpi">
+            <bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
+                <property name="ipFinder">
+                    <bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.kubernetes.TcpDiscoveryKubernetesIpFinder">
+                        <property name="serviceName" value="ignite"/>
+                        <property name="namespace" value="ignite"/>
+                        <property name="masterUrl" value="https://192.168.0.100:6443/"/>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+
+        <!--
+            Durable memory / off-heap memory configuration
+        -->
+        <property name="dataStorageConfiguration">
+            <property name="pageSize" value="4096"/>
+
+            <property name="storagePath" value="/mnt/nfsfolder/db"/>
+
+            <property name="walPath" value="${IGNITE_HOME}/wal"/>
+
+            <property name="dbWalArchivePath" value="${IGNITE_HOME}/wal/archive"/>
+
+            <property name="defaultRegionConfiguration">
+                 <bean class="org.apache.ignite.configuration.DataRegionConfiguration">
+                     <property name="name" value="default_region"/>
+                     <property name="initialSize" value="#{100L * 1024 * 1024}"/>
+                     <property name="maxSize" value="#{3L * 1024 * 1024 * 1024}"/>
+                     <property name="metricsEnabled" value="true"/>
+                     <property name="persistenceEnabled" value="false"/>
+                 </bean>
+             </property>
+
+             <property name="dataRegionConfigurations">
+                 <list>
+                      <bean class="org.apache.ignite.configuration.DataRegionConfiguration">
+                          <property name="name" value="tiered_region"/>
+                          <property name="initialSize" value="#{100L * 1024 * 1024}"/>
+                          <property name="maxSize" value="#{3L * 1024 * 1024 * 1024}"/>
+                          <property name="metricsEnabled" value="true"/>
+                          <property name="persistenceEnabled" value="true"/>
+                      </bean>
+                  </list>
+              </property>
+        </property>
+
+        <!--
+            Cache configurations
+        -->
+        <property name="cacheConfiguration">
+            <list>
+                <bean class="org.apache.ignite.configuration.CacheConfiguration">
+                    <property name="name" value="default"/>
+                    <property name="atomicityMode" value="ATOMIC"/>
+                    <property name="backups" value="1"/>
+                </bean>
+            </list>
+        </property>
+
+        <!--
+            This part of the configuration is responsible for how the cluster nodes are going 
+            to talk to each other
+        -->
+        <property name="communicationSpi">
+            <bean class="org.apache.ignite.spi.communication.tcp.TcpCommunicationSpi"/>
+        </property>
+
+        <property name="activeOnStart" value="true"/>
+
+        <property name="autoActivationEnabled" value="true"/>
+
+        <property name="clientMode" value="false"/>
+
+        <property name="peerClassLoadingEnabled" value="true"/>
+
+    </bean>
+</beans>

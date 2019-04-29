@@ -45,7 +45,7 @@
 
                 <property name="walPath" value="${IGNITE_HOME}/wal"/>
 
-                <property name="dbWalArchivePath" value="${IGNITE_HOME}/wal/archive"/>
+                <property name="walArchivePath" value="${IGNITE_HOME}/wal/archive"/>
 
                 <property name="defaultRegionConfiguration">
                     <bean class="org.apache.ignite.configuration.DataRegionConfiguration">

@@ -47,7 +47,7 @@
 
                 <property name="walArchivePath" value="${IGNITE_HOME}/wal/archive"/>
 
-                <property name="defaultRegionConfiguration">
+                <property name="defaultDataRegionConfiguration">
                     <bean class="org.apache.ignite.configuration.DataRegionConfiguration">
                         <property name="name" value="default_region"/>
                         <property name="initialSize" value="#{100L * 1024 * 1024}"/>

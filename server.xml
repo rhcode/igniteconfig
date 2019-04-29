@@ -26,9 +26,9 @@
             <bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
                 <property name="ipFinder">
                     <bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.kubernetes.TcpDiscoveryKubernetesIpFinder">
-                        <property name="serviceName" value="ignite"/>
+                        <property name="serviceName" value="ignite-service"/>
                         <property name="namespace" value="ignite"/>
-                        <property name="masterUrl" value="https://192.168.0.100:6443/"/>
+                        <property name="masterUrl" value="https://192.168.0.100:6443"/>
                     </bean>
                 </property>
             </bean>
